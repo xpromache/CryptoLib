@@ -359,6 +359,9 @@ extern uint8_t badFECF;
 extern uint32_t crc32Table[CRC32TBL_SIZE];
 extern uint16_t crc16Table[CRC16TBL_SIZE];
 
+extern wycheproof_json_object test;
+extern wycheproof_blk_json_object tests[256];
+
 // GF(2^4) field and logarithm tables
 static const uint8_t gf_exp[30] = {1, 2, 4, 8, 3, 6, 12, 11, 5, 10, 7, 14, 15, 13, 9,
                                    1, 2, 4, 8, 3, 6, 12, 11, 5, 10, 7, 14, 15, 13, 9};

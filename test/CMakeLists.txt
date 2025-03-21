@@ -52,6 +52,11 @@ add_test(NAME UT_TM_APPLY
 add_test(NAME UT_TM_PROCESS
          COMMAND ${PROJECT_BINARY_DIR}/bin/ut_tm_process 
          WORKING_DIRECTORY ${PROJECT_TEST_DIR})
+
+add_test(NAME AES_GCM
+         COMMAND ${PROJECT_BINARY_DIR}/bin/aes_gcm
+         WORKING_DIRECTORY ${PROJECT_TEST_DIR})
+         
 if(CRYPTO_EPROC)        
     add_test(NAME UT_EP_MC
             COMMAND ${PROJECT_BINARY_DIR}/bin/ut_ep_mc 
@@ -130,6 +135,7 @@ endif()
 
 include_directories(include)
 include_directories(../include) 
+include_directories(../include/wycheproof) 
 
 # if(TEST_ENC)
 #     set(Python3_FIND_STRATEGY VERSION)
@@ -140,7 +146,7 @@ include_directories(../include)
 #     endif()
 # endif()
 
-file( GLOB UNIT_FILES unit/*.c)
+file( GLOB UNIT_FILES unit/*.c unit/wycheproof/*.c)
 foreach(SOURCE_PATH ${UNIT_FILES})
     get_filename_component(EXECUTABLE_NAME ${SOURCE_PATH} NAME_WE)
 

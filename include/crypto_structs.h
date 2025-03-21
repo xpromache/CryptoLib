@@ -49,6 +49,25 @@ typedef struct
 } __attribute__((packed)) crypto_gvcid_t;
 #define CRYPTO_GVCID_SIZE (sizeof(crypto_gvcid_t))
 
+typedef struct
+{                       
+    int    tcId; 
+    char  *key[64];
+    char  *iv[32];
+    char  *aad[128];
+    char  *msg[256];
+    char  *ct[256];
+    char  *tag[64];
+    char  *result[16];
+} wycheproof_json_object;
+#define CRYPTO_WYCHEPROOF_SIZE (sizeof(wycheproof_json_object))
+
+typedef struct
+{                       
+    wycheproof_json_object *blk[256];
+} wycheproof_blk_json_object;
+#define CRYPTO_WYCHEPROOF_BLK_SIZE (sizeof(wycheproof_blk_json_object))
+
 /*
 ** Security Association
 *  https://public.ccsds.org/Pubs/355x0b2.pdf
