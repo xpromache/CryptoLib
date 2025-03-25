@@ -56,6 +56,11 @@ add_test(NAME UT_TM_PROCESS
 add_test(NAME AES_GCM
          COMMAND ${PROJECT_BINARY_DIR}/bin/aes_gcm
          WORKING_DIRECTORY ${PROJECT_TEST_DIR})
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(YAJL REQUIRED yajl)
+
+include_directories(${YAJL_INCLUDE_DIRS})
          
 if(CRYPTO_EPROC)        
     add_test(NAME UT_EP_MC

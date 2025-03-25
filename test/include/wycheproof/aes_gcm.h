@@ -16,7 +16,7 @@ extern "C"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../../src/crypto/kmc/jsmn.h"
+#include <yajl/yajl_parse.h>
 
 #ifdef __cplusplus
 } /* Close scope of 'extern "C"' declaration which encloses file. */
