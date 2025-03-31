@@ -265,7 +265,7 @@ static int32_t cryptography_encrypt(uint8_t *data_out, size_t len_data_out, uint
 
     if (sa_ptr->ek_ref[0] == '\0')
     {
-        status = CRYPTOGRAHPY_KMC_NULL_ENCRYPTION_KEY_REFERENCE_IN_SA;
+        status = CRYPTOGRAPHY_KMC_NULL_ENCRYPTION_KEY_REFERENCE_IN_SA;
         return status;
     }
 
@@ -342,7 +342,7 @@ static int32_t cryptography_encrypt(uint8_t *data_out, size_t len_data_out, uint
     // Find the 'base64ciphertext' token
     if (parse_result < 0)
     {
-        status = CRYPTOGRAHPY_KMC_CRYPTO_JSON_PARSE_ERROR;
+        status = CRYPTOGRAPHY_KMC_CRYPTO_JSON_PARSE_ERROR;
         printf("Failed to parse JSON: %d\n", parse_result);
         return status;
     }
@@ -444,7 +444,7 @@ static int32_t cryptography_encrypt(uint8_t *data_out, size_t len_data_out, uint
 #endif
             if (http_code != 200)
             {
-                status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
+                status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
                 fprintf(stderr, "KMC Crypto Failure Response:\n%s\n", chunk_write->response);
                 return status;
             }
@@ -455,7 +455,7 @@ static int32_t cryptography_encrypt(uint8_t *data_out, size_t len_data_out, uint
     }
     if (ciphertext_found == CRYPTO_FALSE)
     {
-        status = CRYPTOGRAHPY_KMC_CIPHER_TEXT_NOT_FOUND_IN_JSON_RESPONSE;
+        status = CRYPTOGRAPHY_KMC_CIPHER_TEXT_NOT_FOUND_IN_JSON_RESPONSE;
         return status;
     }
 
@@ -514,7 +514,7 @@ static int32_t cryptography_decrypt(uint8_t *data_out, size_t len_data_out, uint
 
     if (sa_ptr->ek_ref[0] == '\0')
     {
-        status = CRYPTOGRAHPY_KMC_NULL_ENCRYPTION_KEY_REFERENCE_IN_SA;
+        status = CRYPTOGRAPHY_KMC_NULL_ENCRYPTION_KEY_REFERENCE_IN_SA;
         return status;
     }
 
@@ -585,7 +585,7 @@ static int32_t cryptography_decrypt(uint8_t *data_out, size_t len_data_out, uint
     // Find the 'base64ciphertext' token
     if (parse_result < 0)
     {
-        status = CRYPTOGRAHPY_KMC_CRYPTO_JSON_PARSE_ERROR;
+        status = CRYPTOGRAPHY_KMC_CRYPTO_JSON_PARSE_ERROR;
         printf("Failed to parse JSON: %d\n", parse_result);
         return status;
     }
@@ -631,7 +631,7 @@ static int32_t cryptography_decrypt(uint8_t *data_out, size_t len_data_out, uint
 #endif
             if (http_code != 200)
             {
-                status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
+                status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
                 fprintf(stderr, "KMC Crypto Failure Response:\n%s\n", chunk_write->response);
                 return status;
             }
@@ -642,7 +642,7 @@ static int32_t cryptography_decrypt(uint8_t *data_out, size_t len_data_out, uint
     }
     if (ciphertext_found == CRYPTO_FALSE)
     {
-        status = CRYPTOGRAHPY_KMC_CIPHER_TEXT_NOT_FOUND_IN_JSON_RESPONSE;
+        status = CRYPTOGRAPHY_KMC_CIPHER_TEXT_NOT_FOUND_IN_JSON_RESPONSE;
         return status;
     }
 
@@ -715,7 +715,7 @@ static int32_t cryptography_authenticate(uint8_t *data_out, size_t len_data_out,
 
     if (sa_ptr->ak_ref[0] == '\0')
     {
-        status = CRYPTOGRAHPY_KMC_NULL_AUTHENTICATION_KEY_REFERENCE_IN_SA;
+        status = CRYPTOGRAPHY_KMC_NULL_AUTHENTICATION_KEY_REFERENCE_IN_SA;
         return status;
     }
 
@@ -782,7 +782,7 @@ static int32_t cryptography_authenticate(uint8_t *data_out, size_t len_data_out,
     // Find the 'integrityCheckValue' token
     if (parse_result < 0)
     {
-        status = CRYPTOGRAHPY_KMC_CRYPTO_JSON_PARSE_ERROR;
+        status = CRYPTOGRAPHY_KMC_CRYPTO_JSON_PARSE_ERROR;
         printf("Failed to parse JSON: %d\n", parse_result);
         return status;
     }
@@ -829,7 +829,7 @@ static int32_t cryptography_authenticate(uint8_t *data_out, size_t len_data_out,
                     metadata += comma_idx + 1;
                     if (metadata >= metadata_end)
                     {
-                        status = CRYPTOGRAHPY_KMC_ICV_NOT_FOUND_IN_JSON_RESPONSE;
+                        status = CRYPTOGRAPHY_KMC_ICV_NOT_FOUND_IN_JSON_RESPONSE;
                         return status;
                     }
                 }
@@ -865,7 +865,7 @@ static int32_t cryptography_authenticate(uint8_t *data_out, size_t len_data_out,
 #endif
             if (http_code != 200)
             {
-                status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
+                status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
                 fprintf(stderr, "KMC Crypto Failure Response:\n%s\n", chunk_write->response);
                 return status;
             }
@@ -876,7 +876,7 @@ static int32_t cryptography_authenticate(uint8_t *data_out, size_t len_data_out,
     }
     if (icvtext_found == CRYPTO_FALSE)
     {
-        status = CRYPTOGRAHPY_KMC_ICV_NOT_FOUND_IN_JSON_RESPONSE;
+        status = CRYPTOGRAPHY_KMC_ICV_NOT_FOUND_IN_JSON_RESPONSE;
         return status;
     }
 
@@ -954,7 +954,7 @@ static int32_t cryptography_validate_authentication(uint8_t *data_out, size_t le
 
     if (sa_ptr->ak_ref[0] == '\0')
     {
-        status = CRYPTOGRAHPY_KMC_NULL_AUTHENTICATION_KEY_REFERENCE_IN_SA;
+        status = CRYPTOGRAPHY_KMC_NULL_AUTHENTICATION_KEY_REFERENCE_IN_SA;
         return status;
     }
 
@@ -1029,7 +1029,7 @@ static int32_t cryptography_validate_authentication(uint8_t *data_out, size_t le
 
     if (parse_result < 0)
     {
-        status = CRYPTOGRAHPY_KMC_CRYPTO_JSON_PARSE_ERROR;
+        status = CRYPTOGRAPHY_KMC_CRYPTO_JSON_PARSE_ERROR;
         printf("Failed to parse JSON: %d\n", parse_result);
         return status;
     }
@@ -1056,7 +1056,7 @@ static int32_t cryptography_validate_authentication(uint8_t *data_out, size_t le
 #endif
             if (http_code != 200)
             {
-                status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
+                status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
                 fprintf(stderr, "KMC Crypto Generic Failure Response:\n%s\n", chunk_write->response);
                 return status;
             }
@@ -1081,7 +1081,7 @@ static int32_t cryptography_validate_authentication(uint8_t *data_out, size_t le
 #endif
             if (strcmp(result_str, "true") != 0) // KMC crypto service returns true string if ICV check succeeds.
             {
-                status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_MAC_VALIDATION_ERROR;
+                status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_MAC_VALIDATION_ERROR;
                 fprintf(stderr, "KMC Crypto MAC Validation Failure Response:\n%s\n", chunk_write->response);
                 return status;
             }
@@ -1090,7 +1090,7 @@ static int32_t cryptography_validate_authentication(uint8_t *data_out, size_t le
     }
     if (http_status_found == CRYPTO_FALSE)
     {
-        status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
+        status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
         fprintf(stderr, "KMC Crypto Generic Failure Response:\n%s\n", chunk_write->response);
         return status;
     }
@@ -1138,7 +1138,7 @@ static int32_t cryptography_aead_encrypt(uint8_t *data_out, size_t len_data_out,
 
     if (sa_ptr->ek_ref[0] == '\0')
     {
-        status = CRYPTOGRAHPY_KMC_NULL_ENCRYPTION_KEY_REFERENCE_IN_SA;
+        status = CRYPTOGRAPHY_KMC_NULL_ENCRYPTION_KEY_REFERENCE_IN_SA;
         free(iv_base64);
         return status;
     }
@@ -1297,7 +1297,7 @@ static int32_t cryptography_aead_encrypt(uint8_t *data_out, size_t len_data_out,
     // Find the 'base64ciphertext' token
     if (parse_result < 0)
     {
-        status = CRYPTOGRAHPY_KMC_CRYPTO_JSON_PARSE_ERROR;
+        status = CRYPTOGRAPHY_KMC_CRYPTO_JSON_PARSE_ERROR;
         printf("Failed to parse JSON: %d\n", parse_result);
         if (iv_base64 != NULL)
             free(iv_base64);
@@ -1409,7 +1409,7 @@ static int32_t cryptography_aead_encrypt(uint8_t *data_out, size_t len_data_out,
 #endif
             if (http_code != 200)
             {
-                status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
+                status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
                 fprintf(stderr, "KMC Crypto Failure Response:\n%s\n", chunk_write->response);
                 if (iv_base64 != NULL)
                     free(iv_base64);
@@ -1435,7 +1435,7 @@ static int32_t cryptography_aead_encrypt(uint8_t *data_out, size_t len_data_out,
     }
     if (ciphertext_found == CRYPTO_FALSE)
     {
-        status = CRYPTOGRAHPY_KMC_CIPHER_TEXT_NOT_FOUND_IN_JSON_RESPONSE;
+        status = CRYPTOGRAPHY_KMC_CIPHER_TEXT_NOT_FOUND_IN_JSON_RESPONSE;
         if (encrypt_uri != NULL)
             free(encrypt_uri);
         if (iv_base64 != NULL)
@@ -1548,7 +1548,7 @@ static int32_t cryptography_aead_decrypt(uint8_t *data_out, size_t len_data_out,
 
     if (sa_ptr->ek_ref[0] == '\0')
     {
-        status = CRYPTOGRAHPY_KMC_NULL_ENCRYPTION_KEY_REFERENCE_IN_SA;
+        status = CRYPTOGRAPHY_KMC_NULL_ENCRYPTION_KEY_REFERENCE_IN_SA;
         return status;
     }
 
@@ -1683,7 +1683,7 @@ static int32_t cryptography_aead_decrypt(uint8_t *data_out, size_t len_data_out,
     // Find the 'base64ciphertext' token
     if (parse_result < 0)
     {
-        status = CRYPTOGRAHPY_KMC_CRYPTO_JSON_PARSE_ERROR;
+        status = CRYPTOGRAPHY_KMC_CRYPTO_JSON_PARSE_ERROR;
         printf("Failed to parse JSON: %d\n", parse_result);
         free(decrypt_payload);
         free(decrypt_uri);
@@ -1732,7 +1732,7 @@ static int32_t cryptography_aead_decrypt(uint8_t *data_out, size_t len_data_out,
 #endif
             if (http_code != 200)
             {
-                status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
+                status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
                 fprintf(stderr, "KMC Crypto Failure Response:\n%s\n", chunk_write->response);
                 free(chunk_read);
                 free(chunk_write);
@@ -1749,7 +1749,7 @@ static int32_t cryptography_aead_decrypt(uint8_t *data_out, size_t len_data_out,
     }
     if (ciphertext_found == CRYPTO_FALSE)
     {
-        status = CRYPTOGRAHPY_KMC_CIPHER_TEXT_NOT_FOUND_IN_JSON_RESPONSE;
+        status = CRYPTOGRAPHY_KMC_CIPHER_TEXT_NOT_FOUND_IN_JSON_RESPONSE;
         free(chunk_read);
         free(chunk_write);
         free(cleartext_base64);
@@ -2133,7 +2133,7 @@ int32_t curl_response_error_check(CURL *curl_handle, char *response)
             }
             else // CAM not enabled, but cam is configured and 302 received -- likely misconfiguration!
             {
-                response_status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
+                response_status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
                 return response_status;
             }
         }
@@ -2141,7 +2141,7 @@ int32_t curl_response_error_check(CURL *curl_handle, char *response)
 
     if (response_code != 200) // unhandled error case
     {
-        response_status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
+        response_status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
         return response_status;
     }
 
@@ -2151,7 +2151,7 @@ int32_t curl_response_error_check(CURL *curl_handle, char *response)
 
     if (response == NULL) // No response, possibly because service is CAM secured.
     {
-        response_status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_EMPTY_RESPONSE;
+        response_status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_EMPTY_RESPONSE;
         fprintf(stderr, "curl_easy_perform() unexpected empty response: \n%s\n",
                 "Empty Crypto Service response can be caused by CAM security, is CAM configured?");
         return response_status;
@@ -2174,7 +2174,7 @@ int32_t curl_perform_with_cam_retries(CURL *curl_handle, memory_write *chunk_wri
 
         if (res != CURLE_OK) // This is not a response w/return code, this is something breaking!
         {
-            status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
+            status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE;
             fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
             break; // Go to Post retry loop cleanup and return status.
         }
@@ -2227,7 +2227,7 @@ int32_t curl_perform_with_cam_retries(CURL *curl_handle, memory_write *chunk_wri
     if (status == CRYPTO_LIB_SUCCESS &&
         chunk_write->response == NULL) // no error case detected, but invalid NULL response!
     {
-        status = CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_EMPTY_RESPONSE;
+        status = CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_EMPTY_RESPONSE;
     }
     return status;
 }

@@ -422,7 +422,7 @@
 //     }
 //     ASSERT_EQ(CRYPTO_LIB_SUCCESS, status);
 //     // Expected to fail -- KMC doesn't support 0 cipher text input for decrypt function.
-//     // ASSERT_EQ(CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE, status);
+//     // ASSERT_EQ(CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE, status);
 //     printf("Processed PDU:\n");
 //     for (int i=0; i<tc_processed_frame->tc_pdu_len; i++)
 //     {
@@ -614,7 +614,7 @@
 //     {
 //         Crypto_Shutdown();
 //     }
-//     ASSERT_EQ(CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE, status);
+//     ASSERT_EQ(CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE, status);
 
 //     Crypto_Shutdown();
 //     free(enc_tc_jpl_mmt_scid44_vcid1_expect);
@@ -667,7 +667,7 @@
 //         Crypto_Shutdown();
 //     }
 //     // we expect an InvalidAlgorithmParameterException for macLength of that size.
-//     ASSERT_EQ(CRYPTOGRAHPY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE, status);
+//     ASSERT_EQ(CRYPTOGRAPHY_KMC_CRYPTO_SERVICE_GENERIC_FAILURE, status);
 
 //     Crypto_Shutdown();
 //     free(raw_tc_jpl_mmt_scid44_vcid1_expect);

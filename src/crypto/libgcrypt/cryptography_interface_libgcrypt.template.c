@@ -90,7 +90,7 @@ static int32_t cryptography_init(void)
     }
     if (gcry_control(GCRYCTL_SELFTEST) != GPG_ERR_NO_ERROR)
     {
-        status = CRYPTOGRAPHY_LIBRARY_INITIALIZIATION_ERROR;
+        status = CRYPTOGRAPHY_LIBRARY_INITIALIZATION_ERROR;
         printf(KRED "ERROR: gcrypt self test failed\n" RESET);
     }
     gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
