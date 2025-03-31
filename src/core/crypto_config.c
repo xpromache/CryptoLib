@@ -199,16 +199,16 @@ int32_t Crypto_Init(void)
 {
     int32_t status = CRYPTO_LIB_SUCCESS;
 
-    if (crypto_config.init_status == UNITIALIZED)
+    if (crypto_config.init_status == UNINITIALIZED)
     {
         status = CRYPTO_CONFIGURATION_NOT_COMPLETE;
-        printf(KRED "ERROR: CryptoLib must be configured before intializing!\n" RESET);
+        printf(KRED "ERROR: CryptoLib must be configured before initializing!\n" RESET);
         return status; // No configuration set -- return!
     }
     if (gvcid_managed_parameters_array[0].set_flag == 0)
     {
         status = CRYPTO_MANAGED_PARAM_CONFIGURATION_NOT_COMPLETE;
-        printf(KRED "ERROR: CryptoLib  Managed Parameters must be configured before intializing!\n" RESET);
+        printf(KRED "ERROR: CryptoLib  Managed Parameters must be configured before initializing!\n" RESET);
         return status; // No Managed Parameter configuration set -- return!
     }
 
@@ -265,7 +265,7 @@ int32_t Crypto_Init(void)
             if (sa_mariadb_config == NULL)
             {
                 status = CRYPTO_MARIADB_CONFIGURATION_NOT_COMPLETE;
-                printf(KRED "ERROR: CryptoLib MariaDB must be configured before intializing!\n" RESET);
+                printf(KRED "ERROR: CryptoLib MariaDB must be configured before initializing!\n" RESET);
                 return status; // MariaDB connection specified but no configuration exists, return!
             }
             sa_if = get_sa_interface_mariadb();
@@ -346,14 +346,14 @@ int32_t Crypto_Init(void)
 
                 // cFS Standard Initialized Message
 #ifdef DEBUG
-                printf(KBLU "Crypto Lib Intialized.  Version %d.%d.%d.%d\n" RESET, CRYPTO_LIB_MAJOR_VERSION,
+                printf(KBLU "Crypto Lib Initialized.  Version %d.%d.%d.%d\n" RESET, CRYPTO_LIB_MAJOR_VERSION,
                        CRYPTO_LIB_MINOR_VERSION, CRYPTO_LIB_REVISION, CRYPTO_LIB_MISSION_REV);
 #endif
             }
             else
             {
 #ifdef DEBUG
-                printf(KBLU "Error, Crypto Lib NOT Intialized, sa_init() returned error:%d.  Version .%d.%d.%d\n" RESET,
+                printf(KBLU "Error, Crypto Lib NOT Initialized, sa_init() returned error:%d.  Version .%d.%d.%d\n" RESET,
                        CRYPTO_LIB_MAJOR_VERSION, CRYPTO_LIB_MINOR_VERSION, CRYPTO_LIB_REVISION, CRYPTO_LIB_MISSION_REV);
 #endif
             }
@@ -565,14 +565,14 @@ int32_t crypto_free_config_structs(void)
 {
     int32_t status = CRYPTO_LIB_SUCCESS;
 
-    if (crypto_config.init_status == UNITIALIZED)
+    if (crypto_config.init_status == UNINITIALIZED)
     {
         status = CRYPTO_LIB_SUCCESS;
     }
     else
     {
         // free(crypto_config); //no strings in this struct, just free it.
-        crypto_config.init_status = UNITIALIZED;
+        crypto_config.init_status = UNINITIALIZED;
 
         // Config structs with char* types that are malloc'd and must be freed individually.
         if (sa_mariadb_config != NULL)
@@ -639,7 +639,7 @@ char *crypto_deep_copy_string(char *src_string)
 
 /**
  * @brief Function: Crypto_Local_Config
- * Initalizes TM Configuration, Log, and Keyrings
+ * Initializes TM Configuration, Log, and Keyrings
  **/
 void Crypto_Local_Config(void)
 {
@@ -671,7 +671,7 @@ void Crypto_Local_Config(void)
 
 /**
  * @brief Function: Crypto_Local_Init
- * Initalize TM Frame, CLCW
+ * Initialize TM Frame, CLCW
  **/
 void Crypto_Local_Init(void)
 {
@@ -682,7 +682,7 @@ void Crypto_Local_Init(void)
     clcw.cie    = 1; // COP In Effect
     clcw.vci    = 0; // Virtual Channel Identification
     clcw.spare0 = 0; // Reserved Spare
-    clcw.nrfaf  = 0; // No RF Avaliable Flag
+    clcw.nrfaf  = 0; // No RF Available Flag
     clcw.nblf   = 0; // No Bit Lock Flag
     clcw.lof    = 0; // Lock-Out Flag
     clcw.waitf  = 0; // Wait Flag

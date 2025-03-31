@@ -659,7 +659,7 @@ int32_t Crypto_TC_Check_Init_Setup(uint16_t in_frame_length)
 {
     int32_t status = CRYPTO_LIB_SUCCESS;
 
-    if ((crypto_config.init_status == UNITIALIZED) || (mc_if == NULL) || (sa_if == NULL))
+    if ((crypto_config.init_status == UNINITIALIZED) || (mc_if == NULL) || (sa_if == NULL))
     {
         printf(KRED "ERROR: CryptoLib Configuration Not Set! -- CRYPTO_LIB_ERR_NO_CONFIG, Will Exit\n" RESET);
         status = CRYPTO_LIB_ERR_NO_CONFIG;
@@ -1498,7 +1498,7 @@ int32_t Crypto_TC_Process_Sanity_Check(int *len_ingest)
     printf(KYEL "\n----- Crypto_TC_ProcessSecurity START -----\n" RESET);
 #endif
 
-    if ((mc_if == NULL) || (crypto_config.init_status == UNITIALIZED))
+    if ((mc_if == NULL) || (crypto_config.init_status == UNINITIALIZED))
     {
         printf(KRED "ERROR: CryptoLib Configuration Not Set! -- CRYPTO_LIB_ERR_NO_CONFIG, Will Exit\n" RESET);
         status = CRYPTO_LIB_ERR_NO_CONFIG;

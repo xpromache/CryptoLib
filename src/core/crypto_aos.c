@@ -70,7 +70,7 @@ int32_t Crypto_AOS_ApplySecurity(uint8_t *pTfBuffer, uint16_t len_ingest)
         return CRYPTO_LIB_ERR_NULL_BUFFER;
     }
 
-    if ((crypto_config.init_status == UNITIALIZED) || (mc_if == NULL) || (sa_if == NULL))
+    if ((crypto_config.init_status == UNINITIALIZED) || (mc_if == NULL) || (sa_if == NULL))
     {
         printf(KRED "ERROR: CryptoLib Configuration Not Set! -- CRYPTO_LIB_ERR_NO_CONFIG, Will Exit\n" RESET);
         status = CRYPTO_LIB_ERR_NO_CONFIG;
@@ -742,7 +742,7 @@ int32_t Crypto_AOS_ProcessSecurity(uint8_t *p_ingest, uint16_t len_ingest, uint8
         return status;
     }
 
-    if ((crypto_config.init_status == UNITIALIZED) || (mc_if == NULL) || (sa_if == NULL))
+    if ((crypto_config.init_status == UNINITIALIZED) || (mc_if == NULL) || (sa_if == NULL))
     {
 #ifdef AOS_DEBUG
         printf(KRED "ERROR: CryptoLib Configuration Not Set! -- CRYPTO_LIB_ERR_NO_CONFIG, Will Exit\n" RESET);
@@ -759,7 +759,7 @@ int32_t Crypto_AOS_ProcessSecurity(uint8_t *p_ingest, uint16_t len_ingest, uint8
     // Query SA DB for active SA / SDLS parameters
     if (sa_if == NULL) // This should not happen, but tested here for safety
     {
-        printf(KRED "ERROR: SA DB Not initalized! -- CRYPTO_LIB_ERR_NO_INIT, Will Exit\n" RESET);
+        printf(KRED "ERROR: SA DB Not Initialized! -- CRYPTO_LIB_ERR_NO_INIT, Will Exit\n" RESET);
         status = CRYPTO_LIB_ERR_NO_INIT;
         return status;
     }

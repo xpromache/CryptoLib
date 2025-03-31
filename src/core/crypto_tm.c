@@ -39,7 +39,7 @@ int32_t Crypto_TM_Sanity_Check(uint8_t *pTfBuffer)
     }
 
     if ((status == CRYPTO_LIB_SUCCESS) &&
-        ((crypto_config.init_status == UNITIALIZED) || (mc_if == NULL) || (sa_if == NULL)))
+        ((crypto_config.init_status == UNINITIALIZED) || (mc_if == NULL) || (sa_if == NULL)))
     {
         printf(KRED "ERROR: CryptoLib Configuration Not Set! -- CRYPTO_LIB_ERR_NO_CONFIG, Will Exit\n" RESET);
         status = CRYPTO_LIB_ERR_NO_CONFIG;
@@ -955,7 +955,7 @@ int32_t Crypto_TM_Process_Setup(uint16_t len_ingest, uint16_t *byte_idx, uint8_t
     }
 
     if ((status == CRYPTO_LIB_SUCCESS) &&
-        ((crypto_config.init_status == UNITIALIZED) || (mc_if == NULL) || (sa_if == NULL)))
+        ((crypto_config.init_status == UNINITIALIZED) || (mc_if == NULL) || (sa_if == NULL)))
     {
 #ifdef TM_DEBUG
         printf(KRED "ERROR: CryptoLib Configuration Not Set! -- CRYPTO_LIB_ERR_NO_CONFIG, Will Exit\n" RESET);
@@ -971,7 +971,7 @@ int32_t Crypto_TM_Process_Setup(uint16_t len_ingest, uint16_t *byte_idx, uint8_t
     // Query SA DB for active SA / SDLS parameters
     if ((sa_if == NULL) && (status == CRYPTO_LIB_SUCCESS)) // This should not happen, but tested here for safety
     {
-        printf(KRED "ERROR: SA DB Not initalized! -- CRYPTO_LIB_ERR_NO_INIT, Will Exit\n" RESET);
+        printf(KRED "ERROR: SA DB Not Initialized! -- CRYPTO_LIB_ERR_NO_INIT, Will Exit\n" RESET);
         status = CRYPTO_LIB_ERR_NO_INIT;
     }
 

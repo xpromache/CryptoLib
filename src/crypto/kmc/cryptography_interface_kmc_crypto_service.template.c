@@ -146,7 +146,7 @@ static int32_t cryptography_config(void)
 {
     int32_t status = CRYPTO_LIB_SUCCESS;
 
-    // Error out if Crypto_Config_Kmc_Crypto_Service(...) function was not called before intializing library.
+    // Error out if Crypto_Config_Kmc_Crypto_Service(...) function was not called before initializing library.
     if (cryptography_kmc_crypto_config == NULL)
     {
         fprintf(stderr, "You must configure the KMC Crypto Service before starting the interface!\n");

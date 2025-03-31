@@ -599,7 +599,7 @@ static int32_t key_init(void)
     key_ring[136].key_state = KEY_DEACTIVATED;
 
 #ifdef DEBUG
-    printf(KGRN "Key internal interface intialized \n" RESET);
+    printf(KGRN "Key internal interface Initialized \n" RESET);
 #endif
     return status;
 }
