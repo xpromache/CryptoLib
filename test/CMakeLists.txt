@@ -160,7 +160,7 @@ foreach(SOURCE_PATH ${UNIT_FILES})
     # else()
     add_executable(${EXECUTABLE_NAME} ${SOURCE_PATH}) 
     target_sources(${EXECUTABLE_NAME} PRIVATE core/shared_util.c)
-    target_link_libraries(${EXECUTABLE_NAME} LINK_PUBLIC crypto pthread)
+    target_link_libraries(${EXECUTABLE_NAME} LINK_PUBLIC crypto pthread yajl)
     # endif()
 
     # if(TEST_ENC AND ${EXECUTABLE_NAME} STREQUAL et_dt_validation)

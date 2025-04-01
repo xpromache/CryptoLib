@@ -37,21 +37,26 @@ static int handle_map_key(void *ctx, const unsigned char *key, size_t length) {
 // YAJL Callback: Found a string value
 static int handle_string(void *ctx, const unsigned char *val, size_t length) {
     (void)ctx;
+
+    if (length > 256){
+        length = 256;
+    }
+
     if (!in_test_case) return 1; // Ignore if not inside "tests"
 
     AESTest *test = &tests[test_count - 1]; // Current test case
-    char value[256];
-    strncpy(value, (const char *)val, length);
+    char value[257];
+    strncpy(&value[0], (const char *)val, length);
     value[length] = '\0'; // Null-terminate
 
-    if (strcmp(current_key, "comment") == 0) strcpy(test->comment, value);
-    else if (strcmp(current_key, "key") == 0) strcpy(test->key, value);
-    else if (strcmp(current_key, "iv") == 0) strcpy(test->iv, value);
-    else if (strcmp(current_key, "aad") == 0) strcpy(test->aad, value);
-    else if (strcmp(current_key, "msg") == 0) strcpy(test->msg, value);
-    else if (strcmp(current_key, "ct") == 0) strcpy(test->ct, value);
-    else if (strcmp(current_key, "tag") == 0) strcpy(test->tag, value);
-    else if (strcmp(current_key, "result") == 0) strcpy(test->result, value);
+    if (strcmp(current_key, "comment") == 0) strcpy(&test->comment[0], value);
+    else if (strcmp(current_key, "key") == 0) strcpy(&test->key[0], value);
+    else if (strcmp(current_key, "iv") == 0) strcpy(&test->iv[0], value);
+    else if (strcmp(current_key, "aad") == 0) strcpy(&test->aad[0], value);
+    else if (strcmp(current_key, "msg") == 0) strcpy(&test->msg[0], value);
+    else if (strcmp(current_key, "ct") == 0) strcpy(&test->ct[0], value);
+    else if (strcmp(current_key, "tag") == 0) strcpy(&test->tag[0], value);
+    else if (strcmp(current_key, "result") == 0) strcpy(&test->result[0], value);
     
     return 1;
 }
@@ -183,18 +188,23 @@ char *read_json_file(const char *filename) {
     return json_data;
 }
 
-UTEST(AES_GCM, HAPPY_PATH_WYCHEPROOF)
+UTEST(AES_GCM, HAPPY_PATH_TC_APPLY_WYCHEPROOF)
 {
     const char *filename = "/home/jstar/Dev/cryptolib/test/include/wycheproof/aes_gcm.json";
     char *json_data = read_json_file(filename);
+    void *ctx;
+
+    printf("Read File: %s \n", filename);
     if (!json_data) {
-        //return 1;
+        return;
     }
 
     // YAJL Parser Setup
-    yajl_handle hand = yajl_alloc(&callbacks, NULL, NULL);
+    printf("Setting up YAJL...\n");
+    yajl_handle hand = yajl_alloc(&callbacks, NULL, &ctx);
     yajl_status stat = yajl_parse(hand, (const unsigned char *)json_data, strlen(json_data));
 
+    printf("YAJL set up!\n");
     if (stat != yajl_status_ok) {
         unsigned char *err = yajl_get_error(hand, 1, (const unsigned char *)json_data, strlen(json_data));
         fprintf(stderr, "Error: %s\n", err);
@@ -211,6 +221,7 @@ UTEST(AES_GCM, HAPPY_PATH_WYCHEPROOF)
     // Print Parsed Test Cases
     printf("Parsed %d AES-GCM Test Cases:\n", test_count);
     for (int i = 0; i < test_count; i++) {
+        if(strlen(tests[i].aad) > 0) continue;
         printf("\nTest Case ID: %d\n", tests[i].tcId);
         printf("comment: %s\n", tests[i].comment);
         printf("key: %s\n", tests[i].key);
@@ -220,6 +231,86 @@ UTEST(AES_GCM, HAPPY_PATH_WYCHEPROOF)
         printf("ct: %s\n", tests[i].ct);
         printf("tag: %s\n", tests[i].tag);
         printf("result: %s\n", tests[i].result);
+        printf("~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+        remove("sa_save_file.bin");
+        // Setup & Initialize CryptoLib
+        Crypto_Config_CryptoLib(KEY_TYPE_INTERNAL, MC_TYPE_INTERNAL, SA_TYPE_INMEMORY, CRYPTOGRAPHY_TYPE_LIBGCRYPT,
+                                IV_INTERNAL, CRYPTO_TC_CREATE_FECF_TRUE, TC_PROCESS_SDLS_PDUS_TRUE, TC_HAS_PUS_HDR,
+                                TC_IGNORE_SA_STATE_FALSE, TC_IGNORE_ANTI_REPLAY_FALSE, TC_UNIQUE_SA_PER_MAP_ID_TRUE,
+                                TC_CHECK_FECF_TRUE, 0x3F, SA_INCREMENT_NONTRANSMITTED_IV_TRUE);
+        // Crypto_Config_Add_Gvcid_Managed_Parameter(0, 0x0003, 0, TC_HAS_FECF, TC_NO_SEGMENT_HDRS, TC_OCF_NA, 1024,
+        // AOS_FHEC_NA, AOS_IZ_NA, 0);
+        GvcidManagedParameters_t TC_UT_Managed_Parameters = {
+            0, 0x0003, 0, TC_HAS_FECF, AOS_FHEC_NA, AOS_IZ_NA, 0, TC_NO_SEGMENT_HDRS, 1024, TC_OCF_NA, 1};
+        Crypto_Config_Add_Gvcid_Managed_Parameters(TC_UT_Managed_Parameters);
+        Crypto_Init();
+
+        printf("Setting up SA...\n");
+        SecurityAssociation_t *test_association = NULL;
+        test_association = malloc(sizeof(SecurityAssociation_t) * sizeof(uint8_t));
+        sa_if->sa_get_from_spi(1, &test_association);
+        test_association->sa_state = SA_NONE;
+        sa_if->sa_get_from_spi(4, &test_association);
+        test_association->sa_state = SA_OPERATIONAL;
+
+        printf("Setting up Key...\n");
+        test_association->ekid = 0;
+        crypto_key_t *key = key_if->get_key(0);
+        key->key_len = strlen(tests[i].key);
+        for (int j = 0; j < (int)key->key_len; j++)
+            key->value[j] = tests[i].key[j];
+
+        printf("Setting up IV...\n");
+        test_association->shivf_len = strlen(tests[i].iv);
+        test_association->iv_len = strlen(tests[i].iv);
+        for (int j = 0; j < test_association->iv_len; j++)
+            test_association->iv[j] = tests[i].iv[j];
+
+        printf("Setting up Mac...\n");
+        test_association->stmacf_len = strlen(tests[i].tag);
+
+        printf("Setting up ARSN...\n");
+        test_association->arsnw_len = 1;
+        test_association->arsnw = 5;
+        
+        printf("Setting up Assert Val...\n");
+        int assert_val;
+        if (strcmp(tests[i].result, "invalid") == 0)
+        {
+            assert_val = -1;
+        }
+        else
+        {
+            assert_val = 0;
+        }
+        
+        printf("Setting up Test String...\n");
+        // Test string
+        char raw_tc_sdls_ping_h[1024]   = "20030015000004";
+        strncat(raw_tc_sdls_ping_h, &tests[i].iv[0], test_association->iv_len);
+        printf("Packet: %s\n", raw_tc_sdls_ping_h);
+        strncat(raw_tc_sdls_ping_h, tests[i].msg, 256);
+        printf("Packet: %s\n", raw_tc_sdls_ping_h);
+        strncat(raw_tc_sdls_ping_h, tests[i].tag, test_association->stmacf_len);
+        printf("Packet: %s\n", raw_tc_sdls_ping_h);
+
+        char *raw_tc_sdls_ping_b   = NULL;
+        int   raw_tc_sdls_ping_len = 0;
+    
+        hex_conversion(raw_tc_sdls_ping_h, &raw_tc_sdls_ping_b, &raw_tc_sdls_ping_len);
+    
+        uint8_t *ptr_enc_frame = NULL;
+        uint16_t enc_frame_len = 0;
+        int32_t  return_val    = CRYPTO_LIB_SUCCESS;
+        
+        return_val =
+            Crypto_TC_ApplySecurity((uint8_t *)raw_tc_sdls_ping_b, raw_tc_sdls_ping_len, &ptr_enc_frame, &enc_frame_len);
+        
+        ASSERT_EQ(assert_val, return_val);
+        Crypto_Shutdown();
+        free(raw_tc_sdls_ping_b);
+        free(test_association);
     }
     
     ASSERT_EQ(CRYPTO_LIB_SUCCESS, 0);
