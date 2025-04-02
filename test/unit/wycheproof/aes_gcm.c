@@ -5,8 +5,16 @@
 #include "../include/wycheproof/aes_gcm.h"
 
 #define MAX_TESTS 256
+#define MAX_SUITES 42
 
-// Struct to store test case
+// Struct to store test case and suite
+typedef struct {
+    int ivSize;
+    int keySize;
+    int tagSize;
+    int numTests;
+} TestSuite;
+
 typedef struct {
     int tcId;
     char comment[256];
@@ -21,6 +29,8 @@ typedef struct {
 
 // Global variables to hold current parsing state
 AESTest tests[MAX_TESTS];
+TestSuite suites[MAX_SUITES];
+int suite_num = 0;
 int test_count = 0;
 char current_key[64];  // Holds the key name
 int in_test_case = 0;  // Flag to track if we're inside a test case
@@ -44,10 +54,10 @@ static int handle_string(void *ctx, const unsigned char *val, size_t length) {
 
     if (!in_test_case) return 1; // Ignore if not inside "tests"
 
-    AESTest *test = &tests[test_count - 1]; // Current test case
     char value[257];
     strncpy(&value[0], (const char *)val, length);
     value[length] = '\0'; // Null-terminate
+    AESTest *test = &tests[test_count - 1]; // Current test case
 
     if (strcmp(current_key, "comment") == 0) strcpy(&test->comment[0], value);
     else if (strcmp(current_key, "key") == 0) strcpy(&test->key[0], value);
@@ -131,13 +141,18 @@ static int handle_number(void *ctx, const char *val, size_t length) {
     char num_str[64];
     strncpy(num_str, val, length);
     num_str[length] = '\0';
+    TestSuite *suite = &suites[suite_num];
 
     if (strchr(num_str, '.') != NULL) {
         double float_val = atof(num_str);
         printf("Warning: Found floating-point number %f in JSON\n", float_val);
     } else {
         int int_val = atoi(num_str);
-        if (strcmp(current_key, "tcId") == 0) {
+        if (strcmp(current_key, "ivSize") == 0) {suite->ivSize = int_val;}
+        else if (strcmp(current_key, "keySize") == 0) {suite->keySize = int_val;}
+        else if (strcmp(current_key, "tagSize") == 0) {suite->tagSize = int_val;}
+        else if (strcmp(current_key, "numTests") == 0) {suite->numTests = int_val; suite_num++;}
+        else if (strcmp(current_key, "tcId") == 0) {
             tests[test_count].tcId = int_val;
             test_count++;
             in_test_case = 1;
@@ -220,97 +235,120 @@ UTEST(AES_GCM, HAPPY_PATH_TC_APPLY_WYCHEPROOF)
 
     // Print Parsed Test Cases
     printf("Parsed %d AES-GCM Test Cases:\n", test_count);
-    for (int i = 0; i < test_count; i++) {
-        if(strlen(tests[i].aad) > 0) continue;
-        printf("\nTest Case ID: %d\n", tests[i].tcId);
-        printf("comment: %s\n", tests[i].comment);
-        printf("key: %s\n", tests[i].key);
-        printf("iv: %s\n", tests[i].iv);
-        printf("aad: %s\n", tests[i].aad);
-        printf("msg: %s\n", tests[i].msg);
-        printf("ct: %s\n", tests[i].ct);
-        printf("tag: %s\n", tests[i].tag);
-        printf("result: %s\n", tests[i].result);
-        printf("~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-        remove("sa_save_file.bin");
-        // Setup & Initialize CryptoLib
-        Crypto_Config_CryptoLib(KEY_TYPE_INTERNAL, MC_TYPE_INTERNAL, SA_TYPE_INMEMORY, CRYPTOGRAPHY_TYPE_LIBGCRYPT,
-                                IV_INTERNAL, CRYPTO_TC_CREATE_FECF_TRUE, TC_PROCESS_SDLS_PDUS_TRUE, TC_HAS_PUS_HDR,
-                                TC_IGNORE_SA_STATE_FALSE, TC_IGNORE_ANTI_REPLAY_FALSE, TC_UNIQUE_SA_PER_MAP_ID_TRUE,
-                                TC_CHECK_FECF_TRUE, 0x3F, SA_INCREMENT_NONTRANSMITTED_IV_TRUE);
-        // Crypto_Config_Add_Gvcid_Managed_Parameter(0, 0x0003, 0, TC_HAS_FECF, TC_NO_SEGMENT_HDRS, TC_OCF_NA, 1024,
-        // AOS_FHEC_NA, AOS_IZ_NA, 0);
-        GvcidManagedParameters_t TC_UT_Managed_Parameters = {
-            0, 0x0003, 0, TC_HAS_FECF, AOS_FHEC_NA, AOS_IZ_NA, 0, TC_NO_SEGMENT_HDRS, 1024, TC_OCF_NA, 1};
-        Crypto_Config_Add_Gvcid_Managed_Parameters(TC_UT_Managed_Parameters);
-        Crypto_Init();
-
-        printf("Setting up SA...\n");
-        SecurityAssociation_t *test_association = NULL;
-        test_association = malloc(sizeof(SecurityAssociation_t) * sizeof(uint8_t));
-        sa_if->sa_get_from_spi(1, &test_association);
-        test_association->sa_state = SA_NONE;
-        sa_if->sa_get_from_spi(4, &test_association);
-        test_association->sa_state = SA_OPERATIONAL;
-
-        printf("Setting up Key...\n");
-        test_association->ekid = 0;
-        crypto_key_t *key = key_if->get_key(0);
-        key->key_len = strlen(tests[i].key);
-        for (int j = 0; j < (int)key->key_len; j++)
-            key->value[j] = tests[i].key[j];
-
-        printf("Setting up IV...\n");
-        test_association->shivf_len = strlen(tests[i].iv);
-        test_association->iv_len = strlen(tests[i].iv);
-        for (int j = 0; j < test_association->iv_len; j++)
-            test_association->iv[j] = tests[i].iv[j];
-
-        printf("Setting up Mac...\n");
-        test_association->stmacf_len = strlen(tests[i].tag);
-
-        printf("Setting up ARSN...\n");
-        test_association->arsnw_len = 1;
-        test_association->arsnw = 5;
-        
-        printf("Setting up Assert Val...\n");
-        int assert_val;
-        if (strcmp(tests[i].result, "invalid") == 0)
+    for (int j = 0; j < MAX_SUITES; j++)
+    {
+        printf("j = %d\n", j);
+        for (int i = 0; i < suites[j].numTests; i++) 
         {
-            assert_val = -1;
-        }
-        else
-        {
-            assert_val = 0;
-        }
-        
-        printf("Setting up Test String...\n");
-        // Test string
-        char raw_tc_sdls_ping_h[1024]   = "20030015000004";
-        strncat(raw_tc_sdls_ping_h, &tests[i].iv[0], test_association->iv_len);
-        printf("Packet: %s\n", raw_tc_sdls_ping_h);
-        strncat(raw_tc_sdls_ping_h, tests[i].msg, 256);
-        printf("Packet: %s\n", raw_tc_sdls_ping_h);
-        strncat(raw_tc_sdls_ping_h, tests[i].tag, test_association->stmacf_len);
-        printf("Packet: %s\n", raw_tc_sdls_ping_h);
+            printf("i = %d\n", i);
+            if(strlen(tests[i].aad) > 0) continue;
+            printf("\nTest Case ID: %d\n", tests[i].tcId);
+            printf("comment: %s\n", tests[i].comment);
+            printf("key: %s\n", tests[i].key);
+            printf("iv: %s\n", tests[i].iv);
+            printf("aad: %s\n", tests[i].aad);
+            printf("msg: %s\n", tests[i].msg);
+            printf("ct: %s\n", tests[i].ct);
+            printf("tag: %s\n", tests[i].tag);
+            printf("result: %s\n", tests[i].result);
+            printf("~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-        char *raw_tc_sdls_ping_b   = NULL;
-        int   raw_tc_sdls_ping_len = 0;
-    
-        hex_conversion(raw_tc_sdls_ping_h, &raw_tc_sdls_ping_b, &raw_tc_sdls_ping_len);
-    
-        uint8_t *ptr_enc_frame = NULL;
-        uint16_t enc_frame_len = 0;
-        int32_t  return_val    = CRYPTO_LIB_SUCCESS;
+            remove("sa_save_file.bin");
+            // Setup & Initialize CryptoLib
+            Crypto_Config_CryptoLib(KEY_TYPE_INTERNAL, MC_TYPE_INTERNAL, SA_TYPE_INMEMORY, CRYPTOGRAPHY_TYPE_LIBGCRYPT,
+                                    IV_INTERNAL, CRYPTO_TC_CREATE_FECF_TRUE, TC_PROCESS_SDLS_PDUS_TRUE, TC_HAS_PUS_HDR,
+                                    TC_IGNORE_SA_STATE_FALSE, TC_IGNORE_ANTI_REPLAY_FALSE, TC_UNIQUE_SA_PER_MAP_ID_TRUE,
+                                    TC_CHECK_FECF_TRUE, 0x3F, SA_INCREMENT_NONTRANSMITTED_IV_TRUE);
+            // Crypto_Config_Add_Gvcid_Managed_Parameter(0, 0x0003, 0, TC_HAS_FECF, TC_NO_SEGMENT_HDRS, TC_OCF_NA, 1024,
+            // AOS_FHEC_NA, AOS_IZ_NA, 0);
+            GvcidManagedParameters_t TC_UT_Managed_Parameters = {
+                0, 0x0003, 0, TC_HAS_FECF, AOS_FHEC_NA, AOS_IZ_NA, 0, TC_NO_SEGMENT_HDRS, 1024, TC_OCF_NA, 1};
+            Crypto_Config_Add_Gvcid_Managed_Parameters(TC_UT_Managed_Parameters);
+            Crypto_Init();
+
+            printf("Setting up SA...\n");
+            SecurityAssociation_t *test_association = NULL;
+            test_association = malloc(sizeof(SecurityAssociation_t) * sizeof(uint8_t));
+            sa_if->sa_get_from_spi(1, &test_association);
+            test_association->sa_state = SA_NONE;
+            sa_if->sa_get_from_spi(4, &test_association);
+            test_association->sa_state = SA_OPERATIONAL;
+
+            printf("Setting up Key...\n");
+            test_association->ekid = 250;
+            crypto_key_t *key = key_if->get_key(250);
+            key->key_state = KEY_ACTIVE;
+            key->key_len = suites[j].keySize / 8;
+            printf("KeyLen: %d\n", key->key_len);
+            for (int k = 0; k < (int)key->key_len; k+=2)
+            {
+                key->value[k] = tests[i].key[k] << 4 | tests[i].key[k+1];
+                printf("KeyVal: %02x\n", (uint8_t)key->value[k]);
+            }
+
+            printf("Setting up IV...\n");
+            test_association->shivf_len = suites[j].ivSize / 8;
+            test_association->iv_len = suites[j].ivSize / 8;
+            printf("IVLen: %d\n", test_association->iv_len);
+            //memcpy(&test_association->iv[0], &tests[i].iv[0], test_association->iv_len);
+            // for (int k = 0; k < test_association->iv_len; k+=2)
+            // {
+            //     test_association->iv[k] = tests[i].iv[k] << 4 | tests[i].iv[k+1];
+            //     printf("IVVal: %02x\n", (uint8_t)test_association->iv[k]);
+            // }
+
+            printf("Setting up Mac...\n");
+            test_association->stmacf_len = suites[j].tagSize / 8;
+            printf("MACLen: %d\n", test_association->stmacf_len);
+
+            printf("Setting up ARSN...\n");
+            test_association->shsnf_len = 1;
+            test_association->arsn_len = 1;
+            test_association->arsn[0] = 0x00;
+            test_association->arsnw_len = 1;
+            test_association->arsnw = 5;
+            
+            printf("Setting up Assert Val...\n");
+            int assert_val;
+            if (strcmp(tests[i].result, "invalid") == 0)
+            {
+                assert_val = -1;
+            }
+            else
+            {
+                assert_val = 0;
+            }
+            printf("Assert Val = %d\n", assert_val);
+            
+            printf("Setting up Test String...\n");
+            // 20030015000004028318ABC1824029138141A2001D0C231287C1182784554CA3A219080A3EA7A5487CB5F7D70FB6C58D038554
+            // Test string
+            char raw_tc_sdls_ping_h[1024]   = "2003003200000400";
+            strncat(raw_tc_sdls_ping_h, &tests[i].iv[0], test_association->iv_len * 2);
+            printf("Packet: %s\n", raw_tc_sdls_ping_h);
+            strncat(raw_tc_sdls_ping_h, tests[i].msg, 256);
+            printf("Packet: %s\n", raw_tc_sdls_ping_h);
+            strncat(raw_tc_sdls_ping_h, tests[i].tag, test_association->stmacf_len * 2);
+            printf("Packet: %s\n", raw_tc_sdls_ping_h);
+
+            char *raw_tc_sdls_ping_b   = NULL;
+            int   raw_tc_sdls_ping_len = 0;
         
-        return_val =
-            Crypto_TC_ApplySecurity((uint8_t *)raw_tc_sdls_ping_b, raw_tc_sdls_ping_len, &ptr_enc_frame, &enc_frame_len);
+            hex_conversion(raw_tc_sdls_ping_h, &raw_tc_sdls_ping_b, &raw_tc_sdls_ping_len);
         
-        ASSERT_EQ(assert_val, return_val);
-        Crypto_Shutdown();
-        free(raw_tc_sdls_ping_b);
-        free(test_association);
+            uint8_t *ptr_enc_frame = NULL;
+            uint16_t enc_frame_len = 0;
+            int32_t  return_val    = CRYPTO_LIB_SUCCESS;
+            
+            return_val =
+                Crypto_TC_ApplySecurity((uint8_t *)raw_tc_sdls_ping_b, raw_tc_sdls_ping_len, &ptr_enc_frame, &enc_frame_len);
+            
+            ASSERT_EQ(assert_val, return_val);
+            Crypto_Shutdown();
+            free(raw_tc_sdls_ping_b);
+            free(test_association);
+        }
     }
     
     ASSERT_EQ(CRYPTO_LIB_SUCCESS, 0);
