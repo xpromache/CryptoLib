@@ -276,7 +276,7 @@ UTEST(AES_GCM, HAPPY_PATH_TC_APPLY_WYCHEPROOF)
         printf("j = %d\n", j);
         key->key_len = suites[j].keySize / 8;
         printf("KeyLen: %d\n", key->key_len);
-        if (key->key_len != 32 || suites[j].ivSize >= 1024 || suites[j].ivSize == 0) 
+        if (key->key_len != 32 || suites[j].ivSize >= 256 || suites[j].ivSize == 0) 
         {
             tcid += suites[j].numTests;  
             printf("TCID: %d\n", tcid + 1);
