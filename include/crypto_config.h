@@ -108,21 +108,17 @@
 #define SA_AUTHENTICATED_ENCRYPTION 3
 
 // Generic Defines
-#define NUM_SA              64
 #define SPI_LEN             2 /* bytes */
 #define SPI_MIN             0
 #define SPI_MAX             NUM_SA - 1
 #define KEY_SIZE            512 /* bytes */
 #define KEY_ID_SIZE         8
 #define MKID_MAX            128
-#define NUM_KEYS            256
 #define DISABLED            0
 #define ENABLED             1
-#define IV_SIZE             16 /* TM IV size bytes */
-#define IV_SIZE_TC          4  /* TC IV size bytes */
+#define IV_SIZE_TC          4 /* TC IV size bytes */
 #define REF_SIZE            250
 #define OCF_SIZE            4
-#define MAC_SIZE            16 /* bytes */
 #define FHECF_SIZE          2
 #define FECF_SIZE           2
 #define TC_SEGMENT_HDR_SIZE 1
@@ -136,7 +132,21 @@
 #define CHALLENGE_MAC_SIZE  16   /* bytes */
 #define BYTE_LEN            8    /* bits */
 #define CRYPTOLIB_APPID     128
-#define MAX_IV_LEN          32   /* bytes */
+#define MAX_IV_LEN          32 /* bytes */
+
+// Configurable via build flags
+#ifndef NUM_SA
+#define NUM_SA 64
+#endif
+#ifndef MAC_SIZE
+#define MAC_SIZE 16 /* bytes */
+#endif
+#ifndef IV_SIZE
+#define IV_SIZE 16 /* TM IV size bytes */
+#endif
+#ifndef NUM_KEYS
+#define NUM_KEYS 256
+#endif
 
 // Monitoring and Control Defines
 #define EMV_SIZE 4  /* bytes */
@@ -203,21 +213,24 @@
 #define TLV_DATA_SIZE 494 /* bytes */
 
 // TM Defines
-#define TM_FRAME_DATA_SIZE 1786 /* bytes */
-#define TM_FILL_SIZE       1145 /* bytes */
-#define TM_PAD_SIZE        2    /* bytes */
+#define TM_FRAME_DATA_SIZE         1786 /* bytes */
+#define TM_FILL_SIZE               1145 /* bytes */
+#define TM_PAD_SIZE                2    /* bytes */
+#define TM_SECONDARY_HDR_MAX_VALUE 63
 
 // AOS Defines
 #define AOS_FRAME_DATA_SIZE 1786 /* bytes */
 #define AOS_FILL_SIZE       1145 /* bytes */
 
 // SDLS Behavior Defines
-#define SDLS_OTAR_IV_OFFSET  2
-#define SDLS_KEYV_MAX_KEYS   21 /* keys */
-#define SDLS_IV_LEN          12 /* bytes */
-#define SDLS_KEYV_KEY_ID_LEN 2  /* bytes */
-#define SDLS_KEY_LEN         32 /* bytes */
-#define SDLS_KEYID_LEN       2  /* bytes */
+#define SDLS_OTAR_IV_OFFSET     2
+#define SDLS_MAX_KEY_UPDATES    16 /* keys */
+#define SDLS_KEYV_MAX_KEYS      21 /* keys */
+#define SDLS_MAX_KEY_UPDATE_LEN 35 /* bytes */
+#define SDLS_IV_LEN             12 /* bytes */
+#define SDLS_KEYV_KEY_ID_LEN    2  /* bytes */
+#define SDLS_KEY_LEN            32 /* bytes */
+#define SDLS_KEYID_LEN          2  /* bytes */
 
 // TC Behavior Defines
 #define TC_SDLS_EP_VCID \

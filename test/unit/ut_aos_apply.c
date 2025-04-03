@@ -302,6 +302,7 @@ UTEST(AOS_APPLY, HAPPY_PATH_CLEAR_FECF_LEFT_BLANK)
     // Crypto_Config_Add_Gvcid_Managed_Parameter(1, 0x0003, 0, AOS_HAS_FECF, TM_SEGMENT_HDRS_NA, AOS_HAS_OCF, 1786,
     // AOS_FHEC_NA, AOS_IZ_NA, 0);
     status = Crypto_Init();
+    ASSERT_EQ(CRYPTO_LIB_SUCCESS, status);
 
     // Test Frame Setup
     // 6 byte header, 2 byte blank SPI, data, FECF
@@ -438,11 +439,12 @@ UTEST(AOS_APPLY, HAPPY_PATH_CLEAR_FHEC_FECF)
     // Crypto_Config_Add_Gvcid_Managed_Parameter(1, 0x0003, 0, AOS_HAS_FECF, AOS_SEGMENT_HDRS_NA, AOS_HAS_OCF, 1786,
     // AOS_HAS_FHEC, AOS_NO_IZ, 0);
     status = Crypto_Init();
+    ASSERT_EQ(CRYPTO_LIB_SUCCESS, status);
 
     // Test Frame Setup
     // 8 byte header (Including FHEC stubbed as 0x8888), 2 byte blank SPI, data, FECF
     char *test_aos_h =
-        "40C00000000030F40000112233445566778899AABBCCDDEEFFA107FF000006D2ABBABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABB"
+        "40C00000000088880000112233445566778899AABBCCDDEEFFA107FF000006D2ABBABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABB"
         "AABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAA"
         "BBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABB"
         "AABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAA"
@@ -575,11 +577,12 @@ UTEST(AOS_APPLY, HAPPY_PATH_CLEAR_FHEC_OID_FECF)
     // Crypto_Config_Add_Gvcid_Managed_Parameter(1, 0x0003, 0, AOS_HAS_FECF, AOS_SEGMENT_HDRS_NA, AOS_HAS_OCF, 1786,
     // AOS_HAS_FHEC, AOS_HAS_IZ, 6);
     status = Crypto_Init();
+    ASSERT_EQ(CRYPTO_LIB_SUCCESS, status);
 
     // Test Frame Setup
     // 8 byte header (Including FHEC stubbed as 0x8888), 2 byte blank SPI, data, FECF
     char *test_aos_h =
-        "40C00000000030F46666666666660000112233445566778899AABBCCDDEEFFA107FF000006D2ABBABBAABBAABBAABBAABBAABBAABBAABB"
+        "40C00000000088886666666666660000112233445566778899AABBCCDDEEFFA107FF000006D2ABBABBAABBAABBAABBAABBAABBAABBAABB"
         "AABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAA"
         "BBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABB"
         "AABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAA"
@@ -651,6 +654,7 @@ UTEST(AOS_APPLY, HAPPY_PATH_CLEAR_FHEC_OID_FECF)
         "BBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABB"
         "AABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAABBAA"
         "BBAABBAA3756F72DE2633CF59B14F1D89A5A7C67BBAABBAA3D89";
+
     char *truth_aos_b   = NULL;
     int   truth_aos_len = 0;
     hex_conversion(truth_aos_h, &truth_aos_b, &truth_aos_len);
@@ -685,6 +689,7 @@ UTEST(AOS_APPLY, HAPPY_PATH_CLEAR_FHEC_OID_FECF)
     }
 
     free(test_aos_b);
+    free(truth_aos_b);
     Crypto_Shutdown();
 }
 
@@ -715,6 +720,7 @@ UTEST(AOS_APPLY, AES_CMAC_256_TEST_BITMASK_1)
     // Crypto_Config_Add_Gvcid_Managed_Parameter(1, 0x0003, 0, AOS_HAS_FECF, AOS_SEGMENT_HDRS_NA, AOS_NO_OCF, 1786,
     // AOS_NO_FHEC, AOS_NO_IZ, 0);
     status = Crypto_Init();
+    ASSERT_EQ(CRYPTO_LIB_SUCCESS, status);
     // Test Frame Setup
     // 6 byte header, 2 byte blank SPI, data, 16 byte MAC, FECF
     char *test_aos_h =
@@ -860,6 +866,7 @@ UTEST(AOS_APPLY, AES_CMAC_256_TEST_BITMASK_0)
     // Crypto_Config_Add_Gvcid_Managed_Parameter(1, 0x0003, 0, AOS_HAS_FECF, AOS_SEGMENT_HDRS_NA, AOS_NO_OCF, 1786,
     // AOS_NO_FHEC, AOS_NO_IZ, 0);
     status = Crypto_Init();
+    ASSERT_EQ(CRYPTO_LIB_SUCCESS, status);
     // Test Frame Setup
     // 6 byte header, 2 byte blank SPI, data, 16 byte MAC, FECF
     char *test_aos_h =
@@ -1025,6 +1032,7 @@ UTEST(AOS_APPLY, AES_GCM)
     Crypto_Config_Add_Gvcid_Managed_Parameters(AOS_UT_Managed_Parameters);
 
     status = Crypto_Init();
+    ASSERT_EQ(CRYPTO_LIB_SUCCESS, status);
     // Test Frame Setup
     // 6 byte header, 2 byte blank SPI, 16 byte blank IV (CCC...), data, FECF
     //                  |  Header  |SPI|
@@ -1166,6 +1174,7 @@ UTEST(AOS_APPLY, AOS_KEY_STATE_TEST)
     Crypto_Config_Add_Gvcid_Managed_Parameters(AOS_UT_Managed_Parameters);
 
     status = Crypto_Init();
+    ASSERT_EQ(CRYPTO_LIB_SUCCESS, status);
     // Test Frame Setup
     // 6 byte header, 2 byte blank SPI, 16 byte blank IV (CCC...), data, MAC, FECF
     //                  |  Header  |SPI|
@@ -1315,6 +1324,7 @@ UTEST(AOS_APPLY, AEAD_GCM_BITMASK_1)
     Crypto_Config_Add_Gvcid_Managed_Parameters(AOS_UT_Managed_Parameters);
 
     status = Crypto_Init();
+    ASSERT_EQ(CRYPTO_LIB_SUCCESS, status);
     // Test Frame Setup
     // 6 byte header, 2 byte blank SPI, 16 byte blank IV (CCC...), data, MAC, FECF
     //                  |  Header  |SPI|
@@ -1398,7 +1408,7 @@ UTEST(AOS_APPLY, AOS_APPLY_BUFFER_OVERFLOW_TEST)
 {
     remove("sa_save_file.bin");
     // Local variables
-    int32_t                status = CRYPTO_LIB_SUCCESS;
+    int32_t status = CRYPTO_LIB_SUCCESS;
 
     // Configure, Add Managed Params, and Init
     Crypto_Config_CryptoLib(KEY_TYPE_INTERNAL, MC_TYPE_INTERNAL, SA_TYPE_INMEMORY, CRYPTOGRAPHY_TYPE_LIBGCRYPT,
@@ -1416,8 +1426,7 @@ UTEST(AOS_APPLY, AOS_APPLY_BUFFER_OVERFLOW_TEST)
     // Test Frame Setup
     // 6 byte header, 2 byte blank SPI, 16 byte blank IV (CCC...), data, MAC, FECF
     //                  |  Header  |SPI|
-    char *test_aos_h =
-        "40C0000000000000CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCFFFF";
+    char *test_aos_h   = "40C0000000000000CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCFFFF";
     char *test_aos_b   = NULL;
     int   test_aos_len = 0;
     hex_conversion(test_aos_h, &test_aos_b, &test_aos_len);
