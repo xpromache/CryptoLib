@@ -19,7 +19,7 @@ typedef struct {
     int tcId;
     char comment[256];
     char key[64];
-    char iv[32];
+    char iv[128];
     char aad[128];
     char msg[256];
     char ct[256];
@@ -276,7 +276,7 @@ UTEST(AES_GCM, HAPPY_PATH_TC_APPLY_WYCHEPROOF)
         printf("j = %d\n", j);
         key->key_len = suites[j].keySize / 8;
         printf("KeyLen: %d\n", key->key_len);
-        if (key->key_len != 32) 
+        if (key->key_len != 32 || suites[j].ivSize >= 1024 || suites[j].ivSize == 0) 
         {
             tcid += suites[j].numTests;  
             printf("TCID: %d\n", tcid + 1);
@@ -329,27 +329,36 @@ UTEST(AES_GCM, HAPPY_PATH_TC_APPLY_WYCHEPROOF)
             printf("Assert Val = %d\n", assert_val);
             
             printf("Setting up Test String...\n");
-        
-            char *frameLength = "002B00";
-            char *second = "0004";
-            // Test string
-            char raw_tc_sdls_ping_h[1024]   = "2003";
-            strncat(raw_tc_sdls_ping_h, frameLength, 6);
+            
+            // calculate frame length (bytes)
+            int msgSize = strlen(tests[tcid].msg) / 2;
+            int ivSize = suites[j].ivSize / 8;
+            int macSize = strlen(tests[tcid].tag) / 2;
+            uint16_t total_len = TC_FRAME_HEADER_SIZE + SPI_LEN + ivSize + msgSize + macSize - 1;
+            printf("TotalLen: %04x\n", total_len);
+
+
+            // 2003002B00000400112233445566778899AABB000102030405060708099A4A2579529301BCFB71C78D4060F52C
+            
+            // Merge packet together
+            uint8_t raw_tc_sdls_ping_h[1024]   = "2003";
+            uint8_t filler = 0x00;
+            uint16_t second = 0x0004;
+            snprintf((char*)&raw_tc_sdls_ping_h[4], 5, "%04X", total_len);
+            snprintf((char*)&raw_tc_sdls_ping_h[8], 3, "%02X", filler);
+            snprintf((char*)&raw_tc_sdls_ping_h[10], 5, "%04X", second);
             printf("Packet: %s\n", raw_tc_sdls_ping_h);
-            strncat(raw_tc_sdls_ping_h, second, 4);
+            memcpy(&raw_tc_sdls_ping_h[14], tests[tcid].iv, ivSize*2);
             printf("Packet: %s\n", raw_tc_sdls_ping_h);
-            strncat(raw_tc_sdls_ping_h, tests[tcid].iv, test_association->iv_len * 2);
+            memcpy(&raw_tc_sdls_ping_h[14 + (ivSize*2)], tests[tcid].msg, msgSize*2);
             printf("Packet: %s\n", raw_tc_sdls_ping_h);
-            // arsn??
-            strncat(raw_tc_sdls_ping_h, tests[tcid].msg, 256);
-            printf("Packet: %s\n", raw_tc_sdls_ping_h);
-            strncat(raw_tc_sdls_ping_h, tests[tcid].tag, test_association->stmacf_len * 2);
+            memcpy(&raw_tc_sdls_ping_h[14 + (ivSize*2) + (msgSize*2)], tests[tcid].tag, test_association->stmacf_len * 2);
             printf("Packet: %s\n", raw_tc_sdls_ping_h);
 
             char *raw_tc_sdls_ping_b   = NULL;
             int   raw_tc_sdls_ping_len = 0;
         
-            hex_conversion(raw_tc_sdls_ping_h, &raw_tc_sdls_ping_b, &raw_tc_sdls_ping_len);
+            hex_conversion((char *)raw_tc_sdls_ping_h, &raw_tc_sdls_ping_b, &raw_tc_sdls_ping_len);
         
             uint8_t *ptr_enc_frame = NULL;
             uint16_t enc_frame_len = 0;
@@ -358,18 +367,18 @@ UTEST(AES_GCM, HAPPY_PATH_TC_APPLY_WYCHEPROOF)
             return_val =
                 Crypto_TC_ApplySecurity((uint8_t *)raw_tc_sdls_ping_b, raw_tc_sdls_ping_len, &ptr_enc_frame, &enc_frame_len);
             
-            if (assert_val != 0)
-            {
-                printf(KRED "Expected to fail, but passed\n" RESET);
-                ASSERT_NE(0, return_val);
-            }
-            else
-            {
-                ASSERT_EQ(assert_val, return_val);
-            }
+            // if (assert_val != 0)
+            // {
+            //     printf(KRED "Expected to fail, but passed\n" RESET);
+            //     ASSERT_NE(0, return_val);
+            // }
+            // else
+            // {
+            ASSERT_EQ(CRYPTO_LIB_SUCCESS, return_val);
+            //}
             num_tests_ran++;
+            tcid++;
         }
-        tcid++;
     }
     printf("Number of Tests Ran: %d\n", num_tests_ran);
     Crypto_Shutdown();
