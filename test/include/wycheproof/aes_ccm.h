@@ -1,5 +1,5 @@
-#ifndef WYCHEPROOF_UT_AES_GCM_H
-#define WYCHEPROOF_UT_AES_GCM_H
+#ifndef WYCHEPROOF_UT_AES_CCM_H
+#define WYCHEPROOF_UT_AES_CCM_H
 
 #ifdef __cplusplus
 extern "C"
@@ -38,11 +38,11 @@ typedef struct {
     char result[16];
 } AESTest;
 
-AESTest tests[256];
-TestSuite suites[42];
+AESTest tests[510];
+TestSuite suites[102];
 
 #ifdef __cplusplus
 } /* Close scope of 'extern "C"' declaration which encloses file. */
 #endif
 
-#endif // WYCHEPROOF_UT_AES_GCM_H
+#endif // WYCHEPROOF_UT_AES_CCM_H

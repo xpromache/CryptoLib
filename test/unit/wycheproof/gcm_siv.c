@@ -1,6 +1,6 @@
-#include "../include/wycheproof/aes_gcm.h"
+#include "../include/wycheproof/gcm_siv.h"
 
-#define MAX_SUITES  42
+#define MAX_SUITES 2
 
 int suite_num = 0;
 int test_count = 0;
@@ -11,9 +11,9 @@ int in_array = 0;
 char *read_json_file(const char *filename);
 yajl_callbacks callbacks;
 
-UTEST(AES_GCM, HAPPY_PATH_AES_GCM_TC_APPLY_WYCHEPROOF)
+UTEST(GCM_SIV, HAPPY_PATH_GCM_SIV_TC_APPLY_WYCHEPROOF)
 {
-    const char *filename = "/home/jstar/Dev/cryptolib/test/include/wycheproof/json/aes_gcm.json";
+    const char *filename = "/home/jstar/Dev/cryptolib/test/include/wycheproof/json/gcm_siv.json";
     char *json_data = read_json_file(filename);
     void *ctx;
     int num_tests_ran = 0;
@@ -70,7 +70,7 @@ UTEST(AES_GCM, HAPPY_PATH_AES_GCM_TC_APPLY_WYCHEPROOF)
     sa_if->sa_get_from_spi(4, &test_association);
     test_association->sa_state = SA_OPERATIONAL;
     test_association->ekid = 250;
-    test_association->ecs = CRYPTO_CIPHER_AES256_GCM;
+    test_association->ecs = CRYPTO_CIPHER_AES256_GCM_SIV;
 
     printf("Setting up ARSN...\n");
     test_association->shsnf_len = 1;
@@ -345,7 +345,6 @@ char *read_json_file(const char *filename) {
     return json_data;
 }
 
-// YAJL Callbacks Setup
 yajl_callbacks callbacks = {
     handle_null,           // null
     handle_boolean,        // boolean

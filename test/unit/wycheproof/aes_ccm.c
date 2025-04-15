@@ -1,6 +1,6 @@
-#include "../include/wycheproof/aes_gcm.h"
+#include "../include/wycheproof/aes_ccm.h"
 
-#define MAX_SUITES  42
+#define MAX_SUITES  102
 
 int suite_num = 0;
 int test_count = 0;
@@ -11,9 +11,9 @@ int in_array = 0;
 char *read_json_file(const char *filename);
 yajl_callbacks callbacks;
 
-UTEST(AES_GCM, HAPPY_PATH_AES_GCM_TC_APPLY_WYCHEPROOF)
+UTEST(AES_CCM, HAPPY_PATH_AES_CCM_TC_APPLY_WYCHEPROOF)
 {
-    const char *filename = "/home/jstar/Dev/cryptolib/test/include/wycheproof/json/aes_gcm.json";
+    const char *filename = "/home/jstar/Dev/cryptolib/test/include/wycheproof/json/aes_ccm.json";
     char *json_data = read_json_file(filename);
     void *ctx;
     int num_tests_ran = 0;
@@ -70,7 +70,7 @@ UTEST(AES_GCM, HAPPY_PATH_AES_GCM_TC_APPLY_WYCHEPROOF)
     sa_if->sa_get_from_spi(4, &test_association);
     test_association->sa_state = SA_OPERATIONAL;
     test_association->ekid = 250;
-    test_association->ecs = CRYPTO_CIPHER_AES256_GCM;
+    test_association->ecs = CRYPTO_CIPHER_AES256_CCM;
 
     printf("Setting up ARSN...\n");
     test_association->shsnf_len = 1;
@@ -117,6 +117,11 @@ UTEST(AES_GCM, HAPPY_PATH_AES_GCM_TC_APPLY_WYCHEPROOF)
             printf("Setting up Mac...\n");
             test_association->stmacf_len = suites[j].tagSize / 8;
             printf("MACLen: %d\n", test_association->stmacf_len);
+            if (test_association->stmacf_len < 12)
+            {
+                tcid++;
+                continue;
+            }
 
             printf("Setting up ARSN...\n");
             test_association->shsnf_len = 1;

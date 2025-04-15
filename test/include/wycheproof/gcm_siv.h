@@ -1,5 +1,5 @@
-#ifndef WYCHEPROOF_UT_AES_GCM_H
-#define WYCHEPROOF_UT_AES_GCM_H
+#ifndef WYCHEPROOF_UT_GCM_SIV_H
+#define WYCHEPROOF_UT_GCM_SIV_H
 
 #ifdef __cplusplus
 extern "C"
@@ -45,4 +45,4 @@ TestSuite suites[42];
 } /* Close scope of 'extern "C"' declaration which encloses file. */
 #endif
 
-#endif // WYCHEPROOF_UT_AES_GCM_H
+#endif // WYCHEPROOF_UT_GCM_SIV_H

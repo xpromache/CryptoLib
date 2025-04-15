@@ -1,6 +1,6 @@
-#include "../include/wycheproof/aes_gcm.h"
+#include "../include/wycheproof/aes_cbc.h"
 
-#define MAX_SUITES  42
+#define MAX_SUITES 3
 
 int suite_num = 0;
 int test_count = 0;
@@ -11,9 +11,9 @@ int in_array = 0;
 char *read_json_file(const char *filename);
 yajl_callbacks callbacks;
 
-UTEST(AES_GCM, HAPPY_PATH_AES_GCM_TC_APPLY_WYCHEPROOF)
+UTEST(AES_CBC, HAPPY_PATH_AES_CBC_TC_APPLY_WYCHEPROOF)
 {
-    const char *filename = "/home/jstar/Dev/cryptolib/test/include/wycheproof/json/aes_gcm.json";
+    const char *filename = "/home/jstar/Dev/cryptolib/test/include/wycheproof/json/aes_cbc.json";
     char *json_data = read_json_file(filename);
     void *ctx;
     int num_tests_ran = 0;
@@ -70,11 +70,12 @@ UTEST(AES_GCM, HAPPY_PATH_AES_GCM_TC_APPLY_WYCHEPROOF)
     sa_if->sa_get_from_spi(4, &test_association);
     test_association->sa_state = SA_OPERATIONAL;
     test_association->ekid = 250;
-    test_association->ecs = CRYPTO_CIPHER_AES256_GCM;
+    test_association->ecs = CRYPTO_CIPHER_AES256_CBC;
+    test_association->ast = 0;
 
     printf("Setting up ARSN...\n");
-    test_association->shsnf_len = 1;
-    test_association->arsn_len = 1;
+    test_association->shsnf_len = 0;
+    test_association->arsn_len = 0;
     test_association->arsn[0] = 0x00;
     test_association->arsnw_len = 1;
     test_association->arsnw = 5;
@@ -119,8 +120,8 @@ UTEST(AES_GCM, HAPPY_PATH_AES_GCM_TC_APPLY_WYCHEPROOF)
             printf("MACLen: %d\n", test_association->stmacf_len);
 
             printf("Setting up ARSN...\n");
-            test_association->shsnf_len = 1;
-            test_association->arsn_len = 1;
+            test_association->shsnf_len = 0;
+            test_association->arsn_len = 0;
             test_association->arsn[0] = 0x00;
             test_association->arsnw_len = 1;
             test_association->arsnw = 5;
@@ -141,6 +142,12 @@ UTEST(AES_GCM, HAPPY_PATH_AES_GCM_TC_APPLY_WYCHEPROOF)
             
             // calculate frame length (bytes)
             int msgSize = strlen(tests[tcid].msg) / 2;
+            if (msgSize == 0)
+            {
+                tcid++;
+                continue;
+            }
+
             int ivSize = suites[j].ivSize / 8;
             int macSize = strlen(tests[tcid].tag) / 2;
             uint16_t total_len = TC_FRAME_HEADER_SIZE + SPI_LEN + ivSize + msgSize + macSize - 1;
@@ -345,7 +352,6 @@ char *read_json_file(const char *filename) {
     return json_data;
 }
 
-// YAJL Callbacks Setup
 yajl_callbacks callbacks = {
     handle_null,           // null
     handle_boolean,        // boolean

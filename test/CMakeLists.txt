@@ -57,6 +57,18 @@ add_test(NAME AES_GCM
          COMMAND ${PROJECT_BINARY_DIR}/bin/aes_gcm
          WORKING_DIRECTORY ${PROJECT_TEST_DIR})
 
+add_test(NAME GCM_SIV
+         COMMAND ${PROJECT_BINARY_DIR}/bin/gcm_siv
+         WORKING_DIRECTORY ${PROJECT_TEST_DIR})
+
+add_test(NAME AES_CCM
+         COMMAND ${PROJECT_BINARY_DIR}/bin/aes_ccm
+         WORKING_DIRECTORY ${PROJECT_TEST_DIR})
+
+add_test(NAME AES_CBC
+         COMMAND ${PROJECT_BINARY_DIR}/bin/aes_cbc
+         WORKING_DIRECTORY ${PROJECT_TEST_DIR})
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(YAJL REQUIRED yajl)
 
